@@ -1,4 +1,6 @@
-var width = 960,
+var mapId = '#map';
+
+var width = $(mapId).width(),
     height = 500;
 
 var projection = d3.geo.conicConformal()
@@ -12,7 +14,7 @@ var projection = d3.geo.conicConformal()
 var path = d3.geo.path()
     .projection(projection);
 
-var svg = d3.select("#map").append("svg")
+var svg = d3.select(mapId).append("svg")
     .attr("width", width)
     .attr("height", height);
 
