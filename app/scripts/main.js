@@ -41,13 +41,13 @@ function resize() {
 	
 }
 
-d3.json("../data/usboundary.json", function(error, us) {
-	
+d3.json("../data/us.json", function(error, us) {
+
 	var defs = svg.append('defs');
 
 	defs.append("path")
 		.attr("id", "land")
-		.datum(topojson.feature(us, us.objects.layer1))
+		.datum(topojson.feature(us, us.objects.land))
 		.attr("d", path);
 
     svg.append('clipPath')
@@ -57,7 +57,7 @@ d3.json("../data/usboundary.json", function(error, us) {
 
     svg.append("image")
     	.attr('id', 'relief')
-		//.attr("clip-path", "url(#clip)")
+		.attr("clip-path", "url(#clip)")
 		.attr("xlink:href", "../data/relief.png");
 
 	svg.append("use")
