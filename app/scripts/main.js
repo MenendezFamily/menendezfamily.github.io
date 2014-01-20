@@ -38,6 +38,7 @@ function resize() {
 	d3.select(self.frameElement).style("height", height + "px");
 
 	svg.select('#land').attr('d', path);
+	svg.select('#at').attr('d', path);
 	
 }
 
@@ -47,8 +48,7 @@ d3.json("../data/us.json", function(error, us) {
 
 	defs.append("path")
 		.attr("id", "land")
-		.datum(topojson.feature(us, us.objects.land))
-		.attr("d", path);
+		.datum(topojson.feature(us, us.objects.land));
 
     svg.append('clipPath')
     	.attr('id', 'clip')
@@ -63,8 +63,17 @@ d3.json("../data/us.json", function(error, us) {
 	svg.append("use")
 		.attr("xlink:href", "#land");
 
-	d3.select(window).on('resize', resize);
+	d3.json("../data/at.json", function(error, at) {
 
-	resize();
+		svg.append('path')
+			.attr('id', 'at')
+			.datum(topojson.feature(at, at.objects.at));
+
+		d3.select(window).on('resize', resize);
+
+		resize();
+
+	});
 
 });
+
