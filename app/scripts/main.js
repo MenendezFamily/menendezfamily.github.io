@@ -37,7 +37,7 @@ function resize() {
 			.attr("width", width)
 			.attr("height", height);
 
-		svg.select('#relief')
+		svg.select('.relief')
 			.attr('width', width)
 			.attr('height', height);
 
@@ -45,8 +45,8 @@ function resize() {
 
 		svg.select('#land').attr('d', path);
 
-		if (atReady) svg.select('#at').attr('d', path);
-		if (momdadReady) svg.select('#momdad').attr('d', path);
+		if (atReady) svg.select('.at').attr('d', path);
+		if (momdadReady) svg.select('.momdad').attr('d', path);
 		
 	}
 }
@@ -65,7 +65,7 @@ d3.json("../data/us.json", function(error, us) {
     	.attr('xlink:href', '#land');
 
     svg.insert("image", ":first-child")
-    	.attr('id', 'relief')
+    	.attr('class', 'relief')
 		.attr("clip-path", "url(#clip)")
 		.attr("xlink:href", "../data/relief.png");
 
@@ -83,7 +83,7 @@ d3.json("../data/us.json", function(error, us) {
 d3.json("../data/at.json", function(error, at) {
 
 	svg.append('path')
-		.attr('id', 'at')
+		.attr('class', 'at')
 		.datum(topojson.feature(at, at.objects.at));
 
 	atReady = true;
@@ -95,7 +95,7 @@ d3.json("../data/at.json", function(error, at) {
 d3.json("../data/momdad.json", function(error, momdad) {
 
 	svg.append('path')
-		.attr('id', 'momdad')
+		.attr('class', 'momdad')
 		.datum(topojson.feature(momdad, momdad.objects.momdad));
 
 	momdadReady = true;

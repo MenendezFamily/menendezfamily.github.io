@@ -1,27 +1,65 @@
 @import "../bower_components/bootstrap/less/bootstrap.less";
 @icon-font-path: "../fonts/glyphicons/";
 
+// Map styles
+
+#land {
+  fill: none;
+  stroke: #333;
+}
+
+.line {
+  stroke-width: 2;
+  fill: none;
+  
+}
+
+.at {
+  .line;
+  stroke: #00f;
+}
+
+.momdad {
+  .line;
+  stroke: #f00;
+}
+
+// Body styles
+
+.copy {
+  .make-row();
+  text-align: center;
+
+  a {
+    .make-sm-column(6);
+    .make-md-column(5);
+
+    color: #333;
+
+    &:first-child {
+      .make-md-column-offset(1);
+    }
+
+    &:hover {
+      text-decoration: none;
+    }
+
+    h2 {
+      margin: 0;
+      font-weight: normal;
+    }
+
+    p {
+      .lead;
+    }
+  }
+}
+
+// Other
+
 .browsehappy {
   margin: 0.2em 0; 
   background: #ccc; 
   color: #000; 
   padding: 0.2em 0; 
-}
-
-.copy {
-  padding: 0 15px;
-  text-align: center;
-}
-
-// Map styles
-
-#land {
-  fill: none;
-  stroke: #000;
-}
-
-#at, #momdad {
-	stroke: #000;
-	stroke-width: 2;
-  fill: none;
 }
