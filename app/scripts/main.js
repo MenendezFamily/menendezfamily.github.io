@@ -9,6 +9,10 @@ var scaleRatio = 1297 / 956.4032697547684;
 
 var width, height;
 
+var reliefReady = false;
+var atReady = false;
+var momdadReady = false;
+
 var projection = d3.geo.azimuthalEqualArea();
 
 var path = d3.geo.path()
@@ -18,28 +22,33 @@ var svg = map.append("svg");
 
 function resize() {
 
-	width = parseInt(map.style('width'));
-	height = width * reliefRatio;
+	if (reliefReady) {
 
-	projection
-	    .rotate([lonRotate, latRotate])
-	    .center([lonRotate + lonCenter, latRotate + latTop])
-	    .translate([width / 2, 0])
-	    .scale(width * scaleRatio);
+		width = parseInt(map.style('width'));
+		height = width * reliefRatio;
 
-    svg
-    	.attr("width", width)
-    	.attr("height", height);
+		projection
+		    .rotate([lonRotate, latRotate])
+		    .center([lonRotate + lonCenter, latRotate + latTop])
+		    .translate([width / 2, 0])
+		    .scale(width * scaleRatio);
 
-	svg.select('#relief')
-		.attr('width', width)
-		.attr('height', height);
-	
-	d3.select(self.frameElement).style("height", height + "px");
+		svg
+			.attr("width", width)
+			.attr("height", height);
 
-	svg.select('#land').attr('d', path);
-	svg.select('#at').attr('d', path);
-	
+		svg.select('#relief')
+			.attr('width', width)
+			.attr('height', height);
+
+		d3.select(self.frameElement).style("height", height + "px");
+
+		svg.select('#land').attr('d', path);
+
+		if (atReady) svg.select('#at').attr('d', path);
+		if (momdadReady) svg.select('#momdad').attr('d', path);
+		
+	}
 }
 
 d3.json("../data/us.json", function(error, us) {
@@ -55,7 +64,7 @@ d3.json("../data/us.json", function(error, us) {
     	.append('use')
     	.attr('xlink:href', '#land');
 
-    svg.append("image")
+    svg.insert("image", ":first-child")
     	.attr('id', 'relief')
 		.attr("clip-path", "url(#clip)")
 		.attr("xlink:href", "../data/relief.png");
@@ -63,17 +72,34 @@ d3.json("../data/us.json", function(error, us) {
 	svg.append("use")
 		.attr("xlink:href", "#land");
 
-	d3.json("../data/at.json", function(error, at) {
+	reliefReady = true;
 
-		svg.append('path')
-			.attr('id', 'at')
-			.datum(topojson.feature(at, at.objects.at));
+	d3.select(window).on('resize', resize);
 
-		d3.select(window).on('resize', resize);
-
-		resize();
-
-	});
+	resize();
 
 });
 
+d3.json("../data/at.json", function(error, at) {
+
+	svg.append('path')
+		.attr('id', 'at')
+		.datum(topojson.feature(at, at.objects.at));
+
+	atReady = true;
+
+	resize();
+
+});
+
+d3.json("../data/momdad.json", function(error, momdad) {
+
+	svg.append('path')
+		.attr('id', 'momdad')
+		.datum(topojson.feature(momdad, momdad.objects.momdad));
+
+	momdadReady = true;
+
+	resize();
+
+});
