@@ -1,4 +1,5 @@
 @import "../bower_components/bootstrap/less/bootstrap.less";
+@import "variables.less";
 @icon-font-path: "../fonts/glyphicons/";
 
 // Map styles
@@ -9,19 +10,21 @@
 }
 
 .line {
-  stroke-width: 2;
+  stroke-width: 3;
   fill: none;
-  
 }
+
+// Colors from ColorBrewer2
+// pct: #d95f02
 
 .at {
   .line;
-  stroke: #00f;
+  stroke: #1b9e77;
 }
 
 .momdad {
   .line;
-  stroke: #f00;
+  stroke: #7570b3;
 }
 
 // Body styles
@@ -33,8 +36,6 @@
   a {
     .make-sm-column(6);
     .make-md-column(5);
-
-    color: #333;
 
     &:first-child {
       .make-md-column-offset(1);
@@ -77,6 +78,13 @@ html, body {
     .text-muted;
     .text-right;
     .small;
+  }
+
+  a {
+    color: @link-muted-color;
+    &:hover {
+      color: @link-hover-color;
+    }
   }
 }
 
