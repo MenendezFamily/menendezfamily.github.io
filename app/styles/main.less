@@ -4,31 +4,54 @@
 
 // Map styles
 
-#land {
-  fill: none;
-  stroke: #333;
-}
-
-.line {
-  stroke-width: 3;
-  fill: none;
-}
+@duration: 0.3s;
 
 // Colors from ColorBrewer2
-// pct: #d95f02
+@red: #e41a1c;
+@blue: #377eb8;
+@green: #4daf4a;
+@purple: #984ea3;
+@orange: #ff7f00;
+@yellow: #ffff33;
+@brown: #a65628;
+@pink: #f781bf;
+
+#land {
+  fill: none;
+  stroke: @gray;
+}
+
+.glow {
+  //display: none
+  stroke-width: 3;
+  stroke: @brown;
+
+}
+
+.line(@color) {
+  stroke-width: 3;
+  fill: none;
+  transition-duration: @duration;
+  stroke: @color;
+
+  &:hover {
+    text-shadow: 0px 0px 3px @gray;
+  }
+}
 
 .at {
-  .line;
-  stroke: #1b9e77;
+  .line(@brown);
 }
 
 .momdad {
-  .line;
-  stroke: #7570b3;
+  .line(@purple);
 }
 
 // Body styles
 
+body {
+  background: url('../images/mochaGrunge.png');
+}
 .copy {
   .make-row();
   text-align: center;
