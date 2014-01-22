@@ -85,13 +85,6 @@ d3.json("../data/us.json", function(error, us) {
 		.datum(topojson.feature(us, us.objects.land));
 
 	defs.append('filter')
-		.attr('id', 'desat')
-		.append('feColorMatrix')
-			.attr('in', 'SourceGraphic')
-			.attr('type', 'saturate')
-			.attr('values', '0.3');
-
-	defs.append('filter')
 		.attr('id', 'glow')
 		.append('feGaussianBlur')
 			.attr('in', 'SourceGraphic')
@@ -105,8 +98,7 @@ d3.json("../data/us.json", function(error, us) {
     svg.insert("image", ":first-child")
     	.attr('class', 'relief')
 		.attr("clip-path", "url(#clip)")
-		.attr("filter", "url(#desat)")
-		.attr("xlink:href", "../data/relief.png");
+		.attr("xlink:href", "../images/relief.png");
 
 	svg.append("use")
 		.attr("xlink:href", "#land");
