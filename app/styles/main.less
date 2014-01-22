@@ -22,10 +22,11 @@
 }
 
 .glow {
-  //display: none
-  stroke-width: 3;
-  stroke: @brown;
+  opacity: 0;
 
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .line(@color) {
@@ -35,7 +36,7 @@
   stroke: @color;
 
   &:hover {
-    text-shadow: 0px 0px 3px @gray;
+    text-shadow: 0px 0px 3px @color;
   }
 }
 

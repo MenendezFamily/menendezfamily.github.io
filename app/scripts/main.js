@@ -29,8 +29,18 @@ function display() {
 			.attr("xlink:href", "#momdad");
 
 		svg.append("use")
+			.attr('class', 'glow momdad')
+			.attr('filter', 'url(#glow)')
+			.attr('xlink:href', '#momdad');
+
+		svg.append("use")
 			.attr('class', 'at')
 			.attr("xlink:href", "#at");
+
+		svg.append("use")
+			.attr('class', 'glow at')
+			.attr('filter', 'url(#glow)')
+			.attr('xlink:href', '#at');
 
 		// Add resize event handler and run for the first time
 		d3.select(window).on('resize', resize);
@@ -42,13 +52,14 @@ function display() {
 function resize() {
 
 	width = parseInt(map.style('width'));
-	height = width * reliefRatio;
+	height = Math.round(width * reliefRatio);
 
 	projection
 	    .rotate([lonRotate, latRotate])
 	    .center([lonRotate + lonCenter, latRotate + latTop])
 	    .translate([width / 2, 0])
-	    .scale(width * scaleRatio);
+	    .scale(width * scaleRatio)
+	    .precision(.1);
 
 	svg
 		.attr("width", width)
@@ -107,9 +118,6 @@ d3.json("../data/us.json", function(error, us) {
 });
 
 d3.json("../data/at.json", function(error, at) {
-
-		// .attr('class', 'glow')
-		// .attr('filter', 'url(#glow)')
 
 	defs.append('path')
 		.attr('id', 'at')
