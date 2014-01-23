@@ -9,9 +9,9 @@ var scaleRatio = 1297 / 956.4032697547684;
 
 var width, height;
 
+var dataToLoad = ['at', 'at_buffer', 'momdad', 'momdad_buffer'];
+var dataReadyCount = 0;
 var reliefReady = false;
-var atReady = false;
-var momdadReady = false;
 
 var projection = d3.geo.azimuthalEqualArea();
 
@@ -22,7 +22,7 @@ var svg = map.append("svg");
 var defs = svg.append('defs');
 
 function display() {
-	if (reliefReady && atReady && momdadReady) {
+	if (reliefReady && dataReadyCount == dataToLoad.length) {
 		// Add paths to map
 		svg.append("use")
 			.attr('class', 'momdad')
@@ -44,7 +44,6 @@ function display() {
 
 		// Add resize event handler and run for the first time
 		d3.select(window).on('resize', resize);
-
 		resize();
 	}
 }
@@ -109,26 +108,12 @@ d3.json("../data/us.json", function(error, us) {
 
 });
 
-d3.json("../data/at.json", function(error, at) {
-
-	defs.append('path')
-		.attr('id', 'at')
-		.datum(topojson.feature(at, at.objects.at));
-
-	atReady = true;
-
-	display();
-
-});
-
-d3.json("../data/momdad.json", function(error, momdad) {
-
-	defs.append('path')
-		.attr('id', 'momdad')
-		.datum(topojson.feature(momdad, momdad.objects.momdad));
-
-	momdadReady = true;
-
-	display();
-
+dataToLoad.forEach(function(element, index, array) {
+	d3.json('../data/' + element + '.json', function(error, data) {
+		defs.append('path')
+			.attr('id', element)
+			.datum(topojson.feature(data, eval('data.objects.' + element)));
+		dataReadyCount++;
+		display();
+	});
 });
