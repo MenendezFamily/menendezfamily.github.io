@@ -88,7 +88,7 @@ d3.json("../data/us.json", function(error, us) {
 		.attr('id', 'glow')
 		.append('feGaussianBlur')
 			.attr('in', 'SourceGraphic')
-			.attr('stdDeviation', '5');
+			.attr('stdDeviation', '3');
 
     svg.append('clipPath')
     	.attr('id', 'clip')
