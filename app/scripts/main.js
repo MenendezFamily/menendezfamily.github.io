@@ -7,9 +7,16 @@ var scaleRatio = 1297 / 956.4032697547684;
 
 var width, height;
 
+// Data loading
 var dataToLoad = ['at', 'at_buffer', 'momdad', 'momdad_buffer'];
 var dataReadyCount = 0;
 var reliefReady = false;
+
+// Display variables
+var defaultStrokeWidth = '3';
+var mouseoverStrokeWidth ='5';
+var transitionDuration = 300;
+var blurRadius = '3px';
 
 var projection = d3.geo.azimuthalEqualArea();
 
@@ -62,21 +69,45 @@ function display() {
 	if (reliefReady && dataReadyCount == dataToLoad.length) {
 		// Add paths to map
 		// 
-		function drawPath(path) {
+		function drawPath(pathName) {
 			var g = svg.append('g')
-						.attr('class', 'path-group ' + path);
+						.attr('class', 'path-group ' + pathName);
 
-			g.append('use')
+			var path = g.append('use')
 				.attr('class', 'path')
-				.attr('xlink:href', '#' + path);
+				.style('stroke-width', defaultStrokeWidth)
+				.attr('xlink:href', '#' + pathName);
+
+			var link = d3.select('.copy .' + pathName);
+			link.style('transition-duration', transitionDuration + 'ms');
 
 			g.append('use')
 				.attr('class', 'buffer')
-				.attr('xlink:href', '#' + path + '_buffer');
+				.attr('xlink:href', '#' + pathName + '_buffer');
 
-			g.on('mouseover', function() {
-				g.classed('hover', true);
-			});
+			function setPathStroke(width) {
+				path.transition().duration(transitionDuration).style('stroke-width', width);
+			}
+
+			function setTextShadow(width) {
+				link.style('text-shadow', '0px 0px ' + width + ' ' + path.style('stroke'));
+			}
+
+			function doMouseover() {
+				setPathStroke(mouseoverStrokeWidth);
+				setTextShadow(blurRadius);
+			}
+
+			function doMouseout() {
+				setPathStroke(defaultStrokeWidth);
+				setTextShadow('0px');
+			}
+
+			g.on('mouseover', doMouseover);
+			link.on('mouseover', doMouseover);
+
+			g.on('mouseout', doMouseout);
+			link.on('mouseout', doMouseout);
 		}
 
 		drawPath('momdad');
