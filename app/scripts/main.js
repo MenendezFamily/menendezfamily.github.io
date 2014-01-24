@@ -135,6 +135,13 @@ function resize() {
 	width = parseInt(map.style('width'));
 	height = Math.round(width * reliefRatio);
 
+	// Ensure copy text below map is always visible
+	var copyHeight = parseInt(d3.select('.copy').style('height'));
+	if (height + copyHeight > window.innerHeight) {
+		height = window.innerHeight - copyHeight;
+		width = Math.round(height / reliefRatio);
+	}
+
 	projection
 	    .rotate([lonRotate, latRotate])
 	    .center([lonRotate + lonCenter, latRotate + latTop])
