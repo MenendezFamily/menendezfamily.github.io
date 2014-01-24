@@ -29,12 +29,6 @@ d3.json('../data/us.json', function(error, us) {
 		.attr('id', 'land')
 		.datum(topojson.feature(us, us.objects.land));
 
-	defs.append('filter')
-		.attr('id', 'glow')
-		.append('feGaussianBlur')
-			.attr('in', 'SourceGraphic')
-			.attr('stdDeviation', '3');
-
     svg.append('clipPath')
     	.attr('id', 'clip')
     	.append('use')
@@ -73,18 +67,16 @@ function display() {
 						.attr('class', 'path-group ' + path);
 
 			g.append('use')
-				.attr('class', path)
-				.attr('xlink:href', '#' + path);
-
-			g.append('use')
-				.attr('class', 'glow')
-				.attr('filter', 'url(#glow)')
+				.attr('class', 'path')
 				.attr('xlink:href', '#' + path);
 
 			g.append('use')
 				.attr('class', 'buffer')
 				.attr('xlink:href', '#' + path + '_buffer');
 
+			g.on('mouseover', function() {
+				g.classed('hover', true);
+			});
 		}
 
 		drawPath('momdad');

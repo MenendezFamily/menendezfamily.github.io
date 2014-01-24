@@ -21,13 +21,19 @@
   stroke: @gray;
 }
 
+.path-group {
+  pointer-events: all;
+}
+
 .line(@color) {
   stroke-width: 3;
   fill: none;
   stroke: @color;
+  transition-duration: @duration;
 
   &:hover {
     text-shadow: 0px 0px 3px @color;
+    stroke-width: 5;
   }
 }
 
@@ -37,22 +43,6 @@
 
 .momdad {
   .line(@purple);
-}
-
-.path-group {
-  pointer-events: all;
-
-  &:hover {
-    .glow {
-      opacity: 1;
-    }
-  }
-  
-}
-
-.glow {
-  opacity: 0;
-  transition-duration: @duration;
 }
 
 .buffer {
