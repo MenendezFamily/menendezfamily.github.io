@@ -67,23 +67,28 @@ dataToLoad.forEach(function(element, index, array) {
 function display() {
 	if (reliefReady && dataReadyCount == dataToLoad.length) {
 		// Add paths to map
-		svg.append('use')
-			.attr('class', 'momdad')
-			.attr('xlink:href', '#momdad');
+		// 
+		function drawPath(path) {
+			var g = svg.append('g')
+						.attr('class', 'path-group ' + path);
 
-		svg.append('use')
-			.attr('class', 'glow momdad')
-			.attr('filter', 'url(#glow)')
-			.attr('xlink:href', '#momdad');
+			g.append('use')
+				.attr('class', path)
+				.attr('xlink:href', '#' + path);
 
-		svg.append('use')
-			.attr('class', 'at')
-			.attr('xlink:href', '#at');
+			g.append('use')
+				.attr('class', 'glow')
+				.attr('filter', 'url(#glow)')
+				.attr('xlink:href', '#' + path);
 
-		svg.append('use')
-			.attr('class', 'glow at')
-			.attr('filter', 'url(#glow)')
-			.attr('xlink:href', '#at');
+			g.append('use')
+				.attr('class', 'buffer')
+				.attr('xlink:href', '#' + path + '_buffer');
+
+		}
+
+		drawPath('momdad');
+		drawPath('at');
 
 		// Add resize event handler and run for the first time
 		d3.select(window).on('resize', resize);
@@ -115,7 +120,7 @@ function resize() {
 
 	svg.select('#land').attr('d', path);
 
-	svg.select('#at').attr('d', path);
-	svg.select('#momdad').attr('d', path);
-		
+	dataToLoad.forEach(function(element, index, array) {
+		svg.select('#' + element).attr('d', path);
+	});		
 }

@@ -21,18 +21,9 @@
   stroke: @gray;
 }
 
-.glow {
-  opacity: 0;
-
-  &:hover {
-    opacity: 1;
-  }
-}
-
 .line(@color) {
   stroke-width: 3;
   fill: none;
-  transition-duration: @duration;
   stroke: @color;
 
   &:hover {
@@ -46,6 +37,26 @@
 
 .momdad {
   .line(@purple);
+}
+
+.path-group {
+  pointer-events: all;
+
+  &:hover {
+    .glow {
+      opacity: 1;
+    }
+  }
+  
+}
+
+.glow {
+  opacity: 0;
+  transition-duration: @duration;
+}
+
+.buffer {
+  stroke: none;
 }
 
 // Body styles
