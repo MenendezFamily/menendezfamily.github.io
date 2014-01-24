@@ -21,7 +21,7 @@ var reliefReady = false;
 var defaultStrokeWidth = '3';
 var mouseoverStrokeWidth ='5';
 var transitionDuration = 300;
-var blurRadius = '3px';
+var blurRadius = 3;
 
 var projection = d3.geo.azimuthalEqualArea();
 
@@ -101,7 +101,11 @@ function display() {
 			}
 
 			function setTextShadow(width) {
-				link.style('text-shadow', '0px 0px ' + width + ' ' + path.style('stroke'));
+				var textShadow = '0px 0px ' + width + 'px';
+				if (width > 0) {
+					textShadow += ' ' + path.style('stroke');
+				}
+				link.style('text-shadow', textShadow);
 			}
 
 			function doMouseover() {
@@ -111,7 +115,7 @@ function display() {
 
 			function doMouseout() {
 				setPathStroke(defaultStrokeWidth);
-				setTextShadow('0px');
+				setTextShadow(0);
 			}
 
 			g.on('mouseover', doMouseover);
