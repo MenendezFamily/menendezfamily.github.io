@@ -8,7 +8,12 @@ var scaleRatio = 1297 / 956.4032697547684;
 var width, height;
 
 // Data loading
-var dataToLoad = ['at', 'at_buffer', 'momdad', 'momdad_buffer'];
+var dataToLoad = {
+	'at': 'at/',
+	'at_buffer': null,
+	'momdad': 'http://mannymarsha.wordpress.com/',
+	'momdad_buffer': null,
+	};
 var dataReadyCount = 0;
 var reliefReady = false;
 
@@ -55,23 +60,29 @@ d3.json('../data/us.json', function(error, us) {
 
 });
 
-dataToLoad.forEach(function(element, index, array) {
-	d3.json('../data/' + element + '.json', function(error, data) {
+function loadPathCallback(key) {
+	return function(error, data) {
 		defs.append('path')
-			.attr('id', element)
-			.datum(topojson.feature(data, eval('data.objects.' + element)));
+			.attr('id', key)
+			.datum(topojson.feature(data, eval('data.objects.' + key)));
 		dataReadyCount++;
 		display();
-	});
-});
+	};
+}
+
+for (var key in dataToLoad) {
+	d3.json('../data/' + key + '.json', loadPathCallback(key));
+}
 
 function display() {
-	if (reliefReady && dataReadyCount == dataToLoad.length) {
+	if (reliefReady && dataReadyCount == Object.keys(dataToLoad).length) {
 		// Add paths to map
 		// 
 		function drawPath(pathName) {
-			var g = svg.append('g')
-						.attr('class', 'path-group ' + pathName);
+			var g = svg.append('a')
+						.attr('xlink:href', dataToLoad[pathName])
+						.append('g')
+							.attr('class', 'path-group ' + pathName);
 
 			var path = g.append('use')
 				.attr('class', 'path')
@@ -143,7 +154,7 @@ function resize() {
 
 	svg.select('#land').attr('d', path);
 
-	dataToLoad.forEach(function(element, index, array) {
-		svg.select('#' + element).attr('d', path);
-	});		
+	for (var key in dataToLoad) {
+		svg.select('#' + key).attr('d', path);
+	}		
 }
