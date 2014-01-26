@@ -39,7 +39,7 @@ d3.json('../data/us.json', function (error, us) {
 
     defs.append('path')
         .attr('id', 'land')
-        .datum(topojson.feature(us, us.objects.land));
+        .datum(topojson.feature(us, us.objects.us));
 
     svg.append('clipPath')
         .attr('id', 'clip')
