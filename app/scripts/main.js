@@ -9,17 +9,17 @@ var width, height;
 
 // Data loading
 var dataToLoad = {
-	'at': 'at/',
-	'at_buffer': null,
-	'momdad': 'http://mannymarsha.wordpress.com/',
-	'momdad_buffer': null,
-	};
+    'at': 'at/',
+    'at_buffer': null,
+    'momdad': 'http://mannymarsha.wordpress.com/',
+    'momdad_buffer': null,
+};
 var dataReadyCount = 0;
 var reliefReady = false;
 
 // Display variables
 var defaultStrokeWidth = '3';
-var mouseoverStrokeWidth ='5';
+var mouseoverStrokeWidth = '5';
 var transitionDuration = 300;
 var blurRadius = 3;
 
@@ -35,137 +35,137 @@ var defs = svg.append('defs');
 //
 // Load topjson data
 // 
-d3.json('../data/us.json', function(error, us) {
+d3.json('../data/us.json', function (error, us) {
 
-	defs.append('path')
-		.attr('id', 'land')
-		.datum(topojson.feature(us, us.objects.land));
+    defs.append('path')
+        .attr('id', 'land')
+        .datum(topojson.feature(us, us.objects.land));
 
     svg.append('clipPath')
-    	.attr('id', 'clip')
-    	.append('use')
-    	.attr('xlink:href', '#land');
+        .attr('id', 'clip')
+        .append('use')
+        .attr('xlink:href', '#land');
 
     svg.insert('image', ':first-child')
-    	.attr('class', 'relief')
-		.attr('clip-path', 'url(#clip)')
-		.attr('xlink:href', '../images/relief.png');
+        .attr('class', 'relief')
+        .attr('clip-path', 'url(#clip)')
+        .attr('xlink:href', '../images/relief.png');
 
-	svg.append('use')
-		.attr('xlink:href', '#land');
+    svg.append('use')
+        .attr('xlink:href', '#land');
 
-	reliefReady = true;
+    reliefReady = true;
 
-	display();
+    display();
 
 });
 
 function loadPathCallback(key) {
-	return function(error, data) {
-		defs.append('path')
-			.attr('id', key)
-			.datum(topojson.feature(data, eval('data.objects.' + key)));
-		dataReadyCount++;
-		display();
-	};
+    return function (error, data) {
+        defs.append('path')
+            .attr('id', key)
+            .datum(topojson.feature(data, eval('data.objects.' + key)));
+        dataReadyCount++;
+        display();
+    };
 }
 
 for (var key in dataToLoad) {
-	d3.json('../data/' + key + '.json', loadPathCallback(key));
+    d3.json('../data/' + key + '.json', loadPathCallback(key));
 }
 
 function display() {
-	if (reliefReady && dataReadyCount == Object.keys(dataToLoad).length) {
-		// Add paths to map
-		// 
-		function drawPath(pathName) {
-			var g = svg.append('a')
-						.attr('xlink:href', dataToLoad[pathName])
-						.append('g')
-							.attr('class', 'path-group ' + pathName);
+    if (reliefReady && dataReadyCount === Object.keys(dataToLoad).length) {
+        // Add paths to map
+        // 
+        function drawPath(pathName) {
+            var g = svg.append('a')
+                        .attr('xlink:href', dataToLoad[pathName])
+                        .append('g')
+                            .attr('class', 'path-group ' + pathName);
 
-			var path = g.append('use')
-				.attr('class', 'path')
-				.style('stroke-width', defaultStrokeWidth)
-				.attr('xlink:href', '#' + pathName);
+            var path = g.append('use')
+                .attr('class', 'path')
+                .style('stroke-width', defaultStrokeWidth)
+                .attr('xlink:href', '#' + pathName);
 
-			var link = d3.select('.copy .' + pathName);
-			link.style('transition-duration', transitionDuration + 'ms');
+            var link = d3.select('.copy .' + pathName);
+            link.style('transition-duration', transitionDuration + 'ms');
 
-			g.append('use')
-				.attr('class', 'buffer')
-				.attr('xlink:href', '#' + pathName + '_buffer');
+            g.append('use')
+                .attr('class', 'buffer')
+                .attr('xlink:href', '#' + pathName + '_buffer');
 
-			function setPathStroke(width) {
-				path.transition().duration(transitionDuration).style('stroke-width', width);
-			}
+            function setPathStroke(width) {
+                path.transition().duration(transitionDuration).style('stroke-width', width);
+            }
 
-			function setTextShadow(width) {
-				var textShadow = '0px 0px ' + width + 'px';
-				if (width > 0) {
-					textShadow += ' ' + path.style('stroke');
-				}
-				link.style('text-shadow', textShadow);
-			}
+            function setTextShadow(width) {
+                var textShadow = '0px 0px ' + width + 'px';
+                if (width > 0) {
+                    textShadow += ' ' + path.style('stroke');
+                }
+                link.style('text-shadow', textShadow);
+            }
 
-			function doMouseover() {
-				setPathStroke(mouseoverStrokeWidth);
-				setTextShadow(blurRadius);
-			}
+            function doMouseover() {
+                setPathStroke(mouseoverStrokeWidth);
+                setTextShadow(blurRadius);
+            }
 
-			function doMouseout() {
-				setPathStroke(defaultStrokeWidth);
-				setTextShadow(0);
-			}
+            function doMouseout() {
+                setPathStroke(defaultStrokeWidth);
+                setTextShadow(0);
+            }
 
-			g.on('mouseover', doMouseover);
-			link.on('mouseover', doMouseover);
+            g.on('mouseover', doMouseover);
+            link.on('mouseover', doMouseover);
 
-			g.on('mouseout', doMouseout);
-			link.on('mouseout', doMouseout);
-		}
+            g.on('mouseout', doMouseout);
+            link.on('mouseout', doMouseout);
+        }
 
-		drawPath('momdad');
-		drawPath('at');
+        drawPath('momdad');
+        drawPath('at');
 
-		// Add resize event handler and run for the first time
-		d3.select(window).on('resize', resize);
-		resize();
-	}
+        // Add resize event handler and run for the first time
+        d3.select(window).on('resize', resize);
+        resize();
+    }
 }
 
 function resize() {
 
-	width = parseInt(map.style('width'));
-	height = Math.round(width * reliefRatio);
+    width = parseInt(map.style('width'));
+    height = Math.round(width * reliefRatio);
 
-	// Ensure copy text below map is always visible
-	var copyHeight = parseInt(d3.select('.copy').style('height'));
-	if (height + copyHeight > window.innerHeight) {
-		height = window.innerHeight - copyHeight;
-		width = Math.round(height / reliefRatio);
-	}
+    // Ensure copy text below map is always visible
+    var copyHeight = parseInt(d3.select('.copy').style('height'));
+    if (height + copyHeight > window.innerHeight) {
+        height = window.innerHeight - copyHeight;
+        width = Math.round(height / reliefRatio);
+    }
 
-	projection
-	    .rotate([lonRotate, latRotate])
-	    .center([lonRotate + lonCenter, latRotate + latTop])
-	    .translate([width / 2, 0])
-	    .scale(width * scaleRatio)
-	    .precision(.1);
+    projection
+        .rotate([lonRotate, latRotate])
+        .center([lonRotate + lonCenter, latRotate + latTop])
+        .translate([width / 2, 0])
+        .scale(width * scaleRatio)
+        .precision(0.1);
 
-	svg
-		.attr('width', width)
-		.attr('height', height);
+    svg
+        .attr('width', width)
+        .attr('height', height);
 
-	svg.select('.relief')
-		.attr('width', width)
-		.attr('height', height);
+    svg.select('.relief')
+        .attr('width', width)
+        .attr('height', height);
 
-	d3.select(self.frameElement).style('height', height + 'px');
+    d3.select(self.frameElement).style('height', height + 'px');
 
-	svg.select('#land').attr('d', path);
+    svg.select('#land').attr('d', path);
 
-	for (var key in dataToLoad) {
-		svg.select('#' + key).attr('d', path);
-	}		
+    for (var key in dataToLoad) {
+        svg.select('#' + key).attr('d', path);
+    }
 }
