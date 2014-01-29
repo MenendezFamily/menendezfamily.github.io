@@ -3,6 +3,7 @@ var lonRotate = 60;
 var latRotate = -10;
 var latTop = 90;
 var scaleRatio = 0.6;
+var patternSide = 400;
 
 var width, height;
 
@@ -52,8 +53,21 @@ d3.json('../data/world.json', function (error, world) {
         .attr('id', 'land')
         .datum(topojson.feature(world, world.objects.world));
 
+    defs.append('pattern')
+        .attr('id', 'pattern')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', patternSide)
+        .attr('height', patternSide)
+        .append('image')
+            .attr('xlink:href', '../images/mochaGrunge.png')
+            .attr('x', '0')
+            .attr('y', '0')
+            .attr('width', patternSide)
+            .attr('height', patternSide);
+
     svg.append('use')
-        .attr('xlink:href', '#land');
+        .attr('xlink:href', '#land')
+        .attr('fill', 'url(#pattern)');
 
     baseReady = true;
 
