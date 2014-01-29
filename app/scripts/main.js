@@ -92,7 +92,6 @@ for (var key in dataToLoad) {
 function display() {
     if (baseReady && dataReadyCount === Object.keys(dataToLoad).length) {
         // Add paths to map
-        // 
         function drawPath(pathName) {
             var g = svg.append('a')
                         .attr('xlink:href', dataToLoad[pathName])
