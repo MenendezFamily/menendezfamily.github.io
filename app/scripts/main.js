@@ -33,9 +33,15 @@ var projection = d3.geo.orthographic()
 var path = d3.geo.path()
     .projection(projection);
 
+var graticule = d3.geo.graticule();
+
 var map = d3.select('#map');
 var svg = map.append('svg');
 var defs = svg.append('defs');
+
+svg.append("path")
+    .datum(graticule)
+    .attr("id", "graticule");
 
 //
 // Load topjson data
@@ -159,6 +165,7 @@ function resize() {
 
     d3.select(self.frameElement).style('height', height + 'px');
 
+    svg.select('#graticule').attr('d', path);
     svg.select('#land').attr('d', path);
 
     for (var key in dataToLoad) {
