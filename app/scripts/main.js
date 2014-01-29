@@ -13,9 +13,13 @@ var dataToLoad = {
     'at_buffer': null,
     'momdad': 'http://mannymarsha.wordpress.com/',
     'momdad_buffer': null,
+    'transam': 'http://picasaweb.com/nathanbiketrip',
+    'transam_buffer': null,
+    'camino': 'http://blog.travelpod.com/travel-blog/aggiesontheway/2/tpod.html',
+    'camino_buffer': null,
 };
 var dataReadyCount = 0;
-var reliefReady = false;
+var baseReady = false;
 
 // Display variables
 var defaultStrokeWidth = '3';
@@ -35,26 +39,16 @@ var defs = svg.append('defs');
 //
 // Load topjson data
 // 
-d3.json('../data/us.json', function (error, us) {
+d3.json('../data/world.json', function (error, world) {
 
     defs.append('path')
         .attr('id', 'land')
-        .datum(topojson.feature(us, us.objects.us));
-
-    svg.append('clipPath')
-        .attr('id', 'clip')
-        .append('use')
-        .attr('xlink:href', '#land');
-
-    svg.insert('image', ':first-child')
-        .attr('class', 'relief')
-        .attr('clip-path', 'url(#clip)')
-        .attr('xlink:href', '../images/relief.png');
+        .datum(topojson.feature(world, world.objects.world));
 
     svg.append('use')
         .attr('xlink:href', '#land');
 
-    reliefReady = true;
+    baseReady = true;
 
     display();
 
@@ -75,7 +69,7 @@ for (var key in dataToLoad) {
 }
 
 function display() {
-    if (reliefReady && dataReadyCount === Object.keys(dataToLoad).length) {
+    if (baseReady && dataReadyCount === Object.keys(dataToLoad).length) {
         // Add paths to map
         // 
         function drawPath(pathName) {
@@ -126,7 +120,9 @@ function display() {
         }
 
         drawPath('momdad');
+        drawPath('transam');
         drawPath('at');
+        drawPath('camino');
 
         // Add resize event handler and run for the first time
         d3.select(window).on('resize', resize);
