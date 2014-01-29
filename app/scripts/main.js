@@ -1,9 +1,8 @@
-var reliefRatio = 734 / 1170;
-var lonRotate = 100;
-var latRotate = -45;
-var lonCenter = -97.74;
-var latTop = 51.75;
-var scaleRatio = 1297 / 956.4032697547684;
+var reliefRatio = 0.5;
+var lonRotate = 60;
+var latRotate = -10;
+var latTop = 90;
+var scaleRatio = 0.6;
 
 var width, height;
 
@@ -27,7 +26,9 @@ var mouseoverStrokeWidth = '5';
 var transitionDuration = 300;
 var blurRadius = 3;
 
-var projection = d3.geo.azimuthalEqualArea();
+var projection = d3.geo.orthographic()
+    .clipAngle(90)
+    .precision(.1);
 
 var path = d3.geo.path()
     .projection(projection);
@@ -143,11 +144,10 @@ function resize() {
     }
 
     projection
+        .center([lonRotate, latTop])
         .rotate([lonRotate, latRotate])
-        .center([lonRotate + lonCenter, latRotate + latTop])
-        .translate([width / 2, 0])
         .scale(width * scaleRatio)
-        .precision(0.1);
+        .translate([width / 2, 0]);
 
     svg
         .attr('width', width)
