@@ -1,11 +1,13 @@
-var reliefRatio = 0.5;
 var lonRotate = 60;
 var latRotate = -10;
-var latTop = 90;
+var lonCenter = -60;
+var latBottom = 24;
+var marginTop = 20;
+var mapRatio = 0.8;
 var scaleRatio = 0.6;
 var patternSide = 400;
 
-var width, height;
+var width, height, scale;
 
 // Data loading
 var dataToLoad = {
@@ -153,20 +155,21 @@ function display() {
 function resize() {
 
     width = parseInt(map.style('width'));
-    height = Math.round(width * reliefRatio);
+    scale = width * scaleRatio;
+    height = Math.round(scale * mapRatio) + marginTop;
 
     // Ensure copy text below map is always visible
     var copyHeight = parseInt(d3.select('.copy').style('height'));
     if (height + copyHeight > window.innerHeight) {
         height = window.innerHeight - copyHeight;
-        width = Math.round(height / reliefRatio);
+        scale = (height - marginTop) / mapRatio;
     }
 
     projection
-        .center([lonRotate, latTop])
         .rotate([lonRotate, latRotate])
+        .center([lonRotate + lonCenter, latRotate + latBottom])
         .scale(width * scaleRatio)
-        .translate([width / 2, 0]);
+        .translate([width / 2, height]);
 
     svg
         .attr('width', width)
