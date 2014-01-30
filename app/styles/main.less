@@ -63,12 +63,17 @@ body {
 #map {
   width: 100%;
   text-align: center;
-  background: url('../images/low_contrast_linen.png');
+
+  svg {
+    background: url('../images/low_contrast_linen.png');
+    box-shadow: 0 0 5px @gray-dark;
+  }
 }
 
 .copy {
   .make-row();
   text-align: center;
+  padding-top: @line-height-computed;
 
   a {
     .make-sm-column(6);
