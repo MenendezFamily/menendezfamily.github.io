@@ -1,7 +1,9 @@
+// Map centering variables
 var lonRotate = 60;
 var latRotate = -10;
-var lonCenter = -60;
 var latBottom = 24;
+
+// Map sizing variables
 var mapRatio = 0.5;
 var maxWidthRatio = 0.6;
 var maxHeightRatio = 1.3;
@@ -169,7 +171,7 @@ function resize() {
 
     projection
         .rotate([lonRotate, latRotate])
-        .center([lonRotate + lonCenter, latRotate + latBottom])
+        .center([0, latRotate + latBottom])
         .scale(scale)
         .translate([width / 2, height]);
 
