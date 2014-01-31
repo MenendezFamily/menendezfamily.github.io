@@ -2,12 +2,12 @@ var lonRotate = 60;
 var latRotate = -10;
 var lonCenter = -60;
 var latBottom = 24;
-var marginTop = 20;
-var mapRatio = 0.8;
-var scaleRatio = 0.6;
+var mapRatio = 0.5;
+var maxWidthRatio = 0.6;
+var maxHeightRatio = 1.3;
 var patternSide = 400;
 
-var width, height, scale;
+var width, height;
 
 // Data loading
 var dataToLoad = {
@@ -153,22 +153,24 @@ function display() {
 }
 
 function resize() {
-
+    // Ensure entire page is always visible
+    var nonMapHeight = parseInt(d3.select('.container').style('height')) +
+                       parseInt(d3.select('#footer').style('height')) +
+                       5;
     width = parseInt(map.style('width'));
-    scale = width * scaleRatio;
-    height = Math.round(scale * mapRatio) + marginTop;
-
-    // Ensure copy text below map is always visible
-    var copyHeight = parseInt(d3.select('.copy').style('height'));
-    if (height + copyHeight > window.innerHeight) {
-        height = window.innerHeight - copyHeight;
-        scale = (height - marginTop) / mapRatio;
-    }
+    height = Math.min(
+        Math.round(width * mapRatio),
+        window.innerHeight - nonMapHeight
+    );
+    var scale = Math.min(
+        width * maxWidthRatio,
+        height * maxHeightRatio
+    );
 
     projection
         .rotate([lonRotate, latRotate])
         .center([lonRotate + lonCenter, latRotate + latBottom])
-        .scale(width * scaleRatio)
+        .scale(scale)
         .translate([width / 2, height]);
 
     svg

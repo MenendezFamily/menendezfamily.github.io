@@ -76,6 +76,7 @@ body {
   padding-top: @line-height-computed;
 
   a {
+    display: block;
     .make-sm-column(3);
 
     &:hover {
@@ -94,6 +95,7 @@ body {
 
 html, body {
   height: 100%;
+  overflow: hidden; /* For proper width calculation */
   /* The html and body elements cannot have any padding or margin. */
 }
 
