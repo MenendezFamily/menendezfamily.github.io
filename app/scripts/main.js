@@ -11,24 +11,54 @@ var patternSide = 400;
 
 var width = 0, height = 0, scale = 0;
 
-// Colors from ColorBrewer2
 var colors = {
-    'red':      '#e41a1c',
-    'blue':     '#377eb8',
-    'green':    '#4daf4a',
-    'purple':   '#984ea3',
-    'orange':   '#ff7f00',
-    'yellow':   '#ffff33',
-    'brown':    '#a65628',
-    'pink':     '#f781bf',
+// Colors from ColorBrewer2
+    'red':          '#e41a1c',
+    'blue':         '#377eb8',
+    'green':        '#4daf4a',
+    'purple':       '#984ea3',
+    'orange':       '#ff7f00',
+    'yellow':       '#ffff33',
+    'brown':        '#a65628',
+    'pink':         '#f781bf',
+// Colors from variables.less
+    'gray-darker':  '#272B30',
+    'gray-dark':    '#3A3F44',
+    'gray':         '#52575C',
+    'gray-light':   '#7A8288',
+    'gray-lighter': '#999',
 };
 
 // Display variables
-var defaultStrokeWidth = '3',
-    mouseoverStrokeWidth = '5',
-    transitionDurationStroke = 300,
+var transitionDurationStroke = 300,
     transitionDurationWorld = 1000,
+    shadowHeight = 4,
     blurRadius = 3;
+
+var pathStyle = {
+    'stroke-width': 3,
+    'hover': {
+        'stroke-width': 5,
+    }
+};
+
+var graticuleStyle = {
+  'stroke': colors['gray'],
+  'stroke-width': 0.5,
+};
+
+var landStyle = {
+    'stroke': colors['gray'],
+    'stroke-width': 1,
+    'background-image': loadImage('images/mochaGrunge.png'),
+};
+
+// Image loading
+function loadImage(url) {
+    var image = new Image();
+    image.src = url;
+    return image;
+}
 
 // Data loading
 var dataToLoad = {
@@ -68,38 +98,12 @@ var path = d3.geo.path()
     .projection(projection)
     .context(c);
 
-// svg.append("path")
-//     .datum(graticule)
-//     .attr("id", "graticule");
-//     
-
 //
 // Load topjson data
 // 
 var land;
 d3.json('../data/world-110m.json', function (error, world) {
 
-    // defs.append('path')
-    //     .attr('id', 'land')
-    //     .datum(topojson.feature(world, world.objects.world));
-
-    // defs.append('pattern')
-    //     .attr('id', 'pattern')
-    //     .attr('patternUnits', 'userSpaceOnUse')
-    //     .attr('width', patternSide)
-    //     .attr('height', patternSide)
-    //     .append('image')
-    //         .attr('xlink:href', '../images/mochaGrunge.png')
-    //         .attr('x', '0')
-    //         .attr('y', '0')
-    //         .attr('width', patternSide)
-    //         .attr('height', patternSide);
-
-    // svg.append('use')
-    //     .attr('xlink:href', '#land')
-    //     .attr('fill', 'url(#pattern)');
-    //     
-    
     land = topojson.feature(world, world.objects.land);
 
     baseReady = true;
@@ -130,21 +134,12 @@ function display() {
             //             .append('g')
             //                 .attr('class', 'path-group ' + pathName);
 
-            // var path = g.append('use')
-            //     .attr('class', 'path')
-            //     .style('stroke-width', defaultStrokeWidth)
-            //     .attr('xlink:href', '#' + pathName);
-
             // var link = d3.select('.copy .' + pathName);
             // link.style('transition-duration', transitionDuration + 'ms');
 
             // g.append('use')
             //     .attr('class', 'buffer')
             //     .attr('xlink:href', '#' + pathName + '_buffer');
-
-            // function setPathStroke(width) {
-            //     path.transition().duration(transitionDuration).style('stroke-width', width);
-            // }
 
             // function setTextShadow(width) {
             //     var textShadow = '0px 0px ' + width + 'px';
@@ -233,9 +228,6 @@ function draw(rotation) {
 
     d3.select(self.frameElement).style('height', height + 'px');
 
-    // svg.select('#graticule').attr('d', path);
-    // svg.select('#land').attr('d', path);
-
     // for (var key in dataToLoad) {
     //     svg.select('#' + key).attr('d', path);
     // }
@@ -243,16 +235,32 @@ function draw(rotation) {
     // Clear whatever is currently drawn
     c.clearRect(0, 0, width, height);
 
-    c.strokeStyle = '#000', c.lineWidth = 1, c.beginPath(), path(graticule()), c.stroke();
-    c.fillStyle = "#bbb", c.beginPath(), path(land), c.fill(), c.stroke();
+    c.strokeStyle = graticuleStyle['stroke'],
+        c.lineWidth = graticuleStyle['stroke-width'],
+        c.beginPath(),
+        path(graticule()),
+        c.stroke();
+    c.fillStyle = c.createPattern(landStyle['background-image'], 'repeat'),
+        c.strokeStyle = landStyle['stroke'],
+        c.lineWidth = landStyle['stroke-width'],
+        c.beginPath(),
+        path(land),
+        c.fill(),
+        c.stroke();
 
     for (var key in dataToLoad) {
-        c.strokeStyle = dataToLoad[key]['color'], c.lineWidth = defaultStrokeWidth, c.beginPath(), path(dataToLoad[key]['feature']), c.stroke();
+        c.strokeStyle = dataToLoad[key]['color'],
+            c.lineWidth = pathStyle['stroke-width'],
+            c.beginPath(), path(dataToLoad[key]['feature']),
+            c.stroke();
     }
 
-    //         c.fillStyle = "#f00", c.beginPath(), path(countries[i]), c.fill();
-    //         c.strokeStyle = "#fff", c.lineWidth = .5, c.beginPath(), path(borders), c.stroke();
-    //         c.strokeStyle = "#000", c.lineWidth = 2, c.beginPath(), path(globe), c.stroke();
+    // Draw shadow on canvas bottom
+    var shadow = c.createLinearGradient(0, height - shadowHeight, 0, height + shadowHeight);
+    shadow.addColorStop(0, 'transparent');
+    shadow.addColorStop(1, colors['gray-dark']);
+    c.fillStyle = shadow,
+        c.fillRect(0, height - shadowHeight, width, height);
 }
 
 function testRotate(lon) {

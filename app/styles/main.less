@@ -4,50 +4,9 @@
 
 // Map styles
 
-// Colors from ColorBrewer2
-@red: #e41a1c;
-@blue: #377eb8;
-@green: #4daf4a;
-@purple: #984ea3;
-@orange: #ff7f00;
-@yellow: #ffff33;
-@brown: #a65628;
-@pink: #f781bf;
-
-#graticule {
-  fill: none;
-  stroke: @gray;
-  stroke-width: 0.5;
-}
-
-#land {
-  stroke-width: 1;
-  stroke: @gray;
-}
-
 .path-group {
   pointer-events: all;
   fill: none;
-}
-
-.line(@color) {
-  stroke: @color;
-}
-
-.at {
-  .line(@brown);
-}
-
-.momdad {
-  .line(@purple);
-}
-
-.transam {
-  .line(@green);
-}
-
-.camino {
-  .line(@red);
 }
 
 .buffer {
@@ -64,9 +23,9 @@ body {
   width: 100%;
   text-align: center;
 
-  svg {
+  canvas {
     background: url('../images/low_contrast_linen.png');
-    box-shadow: 0 0 5px @gray-dark;
+    border-bottom: 1px solid @gray-dark;
   }
 }
 
