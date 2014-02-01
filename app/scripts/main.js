@@ -223,6 +223,7 @@ function resize() {
     );
 
     draw([lonRotate, latRotate]);
+    drawSvg();
 }
 
 function draw(rotation) {
@@ -232,20 +233,11 @@ function draw(rotation) {
         .scale(scale)
         .translate([width / 2, height]);
 
-    svg
-        .attr('width', width)
-        .attr('height', height);
-
     canvas
         .attr("width", width)  
         .attr("height", height);
 
     d3.select(self.frameElement).style('height', height + 'px');
-
-    // Redraw SVG buffers
-    for (var key in dataToLoad) {
-        svg.select('#' + key).attr('d', svgPath);
-    }
     
     // Clear whatever is currently drawn
     c.clearRect(0, 0, width, height);
@@ -278,6 +270,17 @@ function draw(rotation) {
         c.fillRect(0, height - shadowHeight, width, height);
 }
 
+function drawSvg() {
+    svg
+        .attr('width', width)
+        .attr('height', height);
+
+    // Redraw SVG buffers
+    for (var key in dataToLoad) {
+        svg.select('#' + key).attr('d', svgPath);
+    }
+}
+
 function testRotate(lon) {
     lonRotate = lon;
 
@@ -288,5 +291,6 @@ function testRotate(lon) {
             return function(t) {
                 draw(r(t));
             };
-        });
+        })
+        .each('end', drawSvg);
 }
