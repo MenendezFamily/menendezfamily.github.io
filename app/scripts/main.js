@@ -179,10 +179,6 @@ function resize() {
         .attr('width', width)
         .attr('height', height);
 
-    svg.select('.relief')
-        .attr('width', width)
-        .attr('height', height);
-
     d3.select(self.frameElement).style('height', height + 'px');
 
     svg.select('#graticule').attr('d', path);
