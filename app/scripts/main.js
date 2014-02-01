@@ -9,7 +9,7 @@ var maxWidthRatio = 0.6;
 var maxHeightRatio = 1.3;
 var patternSide = 400;
 
-var width = 0, height = 0;
+var width = 0, height = 0, scale = 0;
 
 // Colors from ColorBrewer2
 var colors = {
@@ -26,7 +26,8 @@ var colors = {
 // Display variables
 var defaultStrokeWidth = '3',
     mouseoverStrokeWidth = '5',
-    transitionDuration = 300,
+    transitionDurationStroke = 300,
+    transitionDurationWorld = 1000,
     blurRadius = 3;
 
 // Data loading
@@ -198,18 +199,25 @@ function resize() {
     var nonMapHeight = parseInt(d3.select('.container').style('height')) +
                        parseInt(d3.select('#footer').style('height')) +
                        5;
+
     width = parseInt(map.style('width'));
+
     height = Math.min(
         Math.round(width * mapRatio),
         window.innerHeight - nonMapHeight
     );
-    var scale = Math.min(
+
+    scale = Math.min(
         width * maxWidthRatio,
         height * maxHeightRatio
     );
 
+    draw([lonRotate, latRotate]);
+}
+
+function draw(rotation) {
     projection
-        .rotate([lonRotate, latRotate])
+        .rotate(rotation)
         .center([0, latRotate + latBottom])
         .scale(scale)
         .translate([width / 2, height]);
@@ -232,6 +240,8 @@ function resize() {
     //     svg.select('#' + key).attr('d', path);
     // }
     
+    // Clear whatever is currently drawn
+    c.clearRect(0, 0, width, height);
 
     c.strokeStyle = '#000', c.lineWidth = 1, c.beginPath(), path(graticule()), c.stroke();
     c.fillStyle = "#bbb", c.beginPath(), path(land), c.fill(), c.stroke();
@@ -243,25 +253,17 @@ function resize() {
     //         c.fillStyle = "#f00", c.beginPath(), path(countries[i]), c.fill();
     //         c.strokeStyle = "#fff", c.lineWidth = .5, c.beginPath(), path(borders), c.stroke();
     //         c.strokeStyle = "#000", c.lineWidth = 2, c.beginPath(), path(globe), c.stroke();
-
 }
 
 function testRotate(lon) {
+    lonRotate = lon;
+
     d3.transition()
-        .duration(1000)
+        .duration(transitionDurationWorld)
         .tween("rotate", function() {
-            r = d3.interpolate(projection.rotate(), [lon, latRotate]);
+            r = d3.interpolate(projection.rotate(), [lonRotate, latRotate]);
             return function(t) {
-                projection.rotate(r(t));
-                c.clearRect(0, 0, width, height);
-                c.strokeStyle = '#000', c.lineWidth = 1, c.beginPath(), path(graticule()), c.stroke();
-                c.fillStyle = "#bbb", c.beginPath(), path(land), c.fill(), c.stroke();
-
-                for (var key in dataToLoad) {
-                    c.strokeStyle = dataToLoad[key]['color'], c.lineWidth = defaultStrokeWidth, c.beginPath(), path(dataToLoad[key]['feature']), c.stroke();
-                }
-
+                draw(r(t));
             };
-        })
-        .transition();
+        });
 }
