@@ -79,13 +79,10 @@ var dataToLoad = {
         'color': colors['red'],
     },
 };
-var dataReadyCount = 0;
-var baseReady = false;
 
 var map = d3.select('#map');
-// var svg = map.append('svg');
-// var defs = svg.append('defs');
 var canvas = map.append("canvas")  
+var svg = map.append('svg');
 
 var c = canvas.node().getContext("2d");
 
@@ -98,92 +95,110 @@ var path = d3.geo.path()
     .projection(projection)
     .context(c);
 
+var svgPath = d3.geo.path()
+    .projection(projection);
+
 //
 // Load topjson data
 // 
-var land;
-d3.json('../data/world-110m.json', function (error, world) {
 
-    land = topojson.feature(world, world.objects.land);
-
-    baseReady = true;
-
-    display();
-
-});
-
-function loadPathCallback(key) {
-    return function (error, data) {
-        dataToLoad[key]['feature'] = topojson.feature(data, eval('data.objects.' + key));
-        dataReadyCount++;
-        display();
+// Add helper methods to String
+if (typeof String.prototype.endsWith !== 'function') {
+    String.prototype.endsWith = function(suffix) {
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
 }
+String.prototype.removeRight = function(suffix) {
+    return this.substring(0, this.length - suffix.length);
+};
+
+var land;
+
+var queue = queue()
+    .defer(d3.json, '../data/world-110m.json');
 
 for (var key in dataToLoad) {
-    d3.json('../data/' + key + '.json', loadPathCallback(key));
-    // TODO: also load buffer
+    queue.defer(d3.json, '../data/' + key + '.json');
+    queue.defer(d3.json, '../data/' + key + '_buffer.json');
 }
 
-function display() {
-   if (baseReady && dataReadyCount === Object.keys(dataToLoad).length) {
-        // Add paths to map
-        function drawPath(pathName) {
-            // var g = svg.append('a')
-            //             .attr('xlink:href', dataToLoad[pathName])
-            //             .append('g')
-            //                 .attr('class', 'path-group ' + pathName);
+queue.awaitAll(ready);
 
-            // var link = d3.select('.copy .' + pathName);
-            // link.style('transition-duration', transitionDuration + 'ms');
+function ready(error, results) {
+    // Load world data
+    var landResult = results.shift();
+    land = topojson.feature(landResult, landResult.objects.land);
 
-            // g.append('use')
-            //     .attr('class', 'buffer')
-            //     .attr('xlink:href', '#' + pathName + '_buffer');
-
-            // function setTextShadow(width) {
-            //     var textShadow = '0px 0px ' + width + 'px';
-            //     if (width > 0) {
-            //         textShadow += ' ' + path.style('stroke');
-            //     }
-            //     link.style('text-shadow', textShadow);
-            // }
-
-            // function doMouseover() {
-            //     setPathStroke(mouseoverStrokeWidth);
-            //     setTextShadow(blurRadius);
-            //     d3.transition()
-            //         .tween("rotate", function() {
-            //             r = d3.interpolate(projection.rotate(), [100, latRotate]);
-            //             return function(t) {
-            //                 projection.rotate(r(t));
-            //                 svg.select('#momdad').attr('d', window.path);
-            //             };
-            //         })
-            //         .transition();
-            // }
-
-            // function doMouseout() {
-            //     setPathStroke(defaultStrokeWidth);
-            //     setTextShadow(0);
-            // }
-
-            // g.on('mouseover', doMouseover);
-            // link.on('mouseover', doMouseover);
-
-            // g.on('mouseout', doMouseout);
-            // link.on('mouseout', doMouseout);
+    // Load all other path + buffer data
+    results.forEach(function(result) {
+        for (var key in result.objects) {
+            if (dataToLoad[key]) {
+                dataToLoad[key]['feature'] = topojson.feature(result, result.objects[key]);
+            }
+            else if (key.endsWith('_buffer')) {
+                parent = key.removeRight('_buffer');
+                if (dataToLoad[parent]) {
+                    dataToLoad[parent]['buffer'] = topojson.feature(result, result.objects[key]);
+                }
+            }
         }
+    });
 
-        // drawPath('momdad');
-        // drawPath('transam');
-        // drawPath('at');
-        // drawPath('camino');
+    // Draw buffers on svg
+    drawBuffer('momdad');
+    drawBuffer('transam');
+    drawBuffer('at');
+    drawBuffer('camino');
 
-        // Add resize event handler and run for the first time
-        d3.select(window).on('resize', resize);
-        resize();
+    // Add resize event handler and run for the first time
+    d3.select(window).on('resize', resize);
+    resize();
+}
+
+function drawBuffer(pathName) {
+    var buffer = svg.append('a')
+                    .attr('class', 'buffer')
+                    .attr('xlink:href', dataToLoad[pathName]['url'])
+                    .append('path')
+                        .attr('id', pathName)
+                        .datum(dataToLoad[pathName]['buffer']);
+
+    var link = d3.select('.copy .' + pathName);
+    link.style('transition-duration', transitionDurationStroke + 'ms');
+
+    function setTextShadow(width) {
+        var textShadow = '0px 0px ' + width + 'px';
+        if (width > 0) {
+            textShadow += ' ' + dataToLoad[pathName]['color'];
+        }
+        link.style('text-shadow', textShadow);
     }
+
+    function doMouseover() {
+        // setPathStroke(mouseoverStrokeWidth);
+        setTextShadow(blurRadius);
+        // d3.transition()
+        //     .tween("rotate", function() {
+        //         r = d3.interpolate(projection.rotate(), [100, latRotate]);
+        //         return function(t) {
+        //             projection.rotate(r(t));
+        //             svg.select('#momdad').attr('d', window.path);
+        //         };
+        //     })
+        //     .transition();
+    }
+
+    function doMouseout() {
+        // setPathStroke(defaultStrokeWidth);
+        setTextShadow(0);
+    }
+
+    // Add event handlers to svg buffers and to html links
+    buffer.on('mouseover', doMouseover);
+    link.on('mouseover', doMouseover);
+
+    buffer.on('mouseout', doMouseout);
+    link.on('mouseout', doMouseout);
 }
 
 function resize() {
@@ -217,10 +232,9 @@ function draw(rotation) {
         .scale(scale)
         .translate([width / 2, height]);
 
-    // svg
-    //     .attr('width', width)
-    //     .attr('height', height);
-    //     
+    svg
+        .attr('width', width)
+        .attr('height', height);
 
     canvas
         .attr("width", width)  
@@ -228,9 +242,10 @@ function draw(rotation) {
 
     d3.select(self.frameElement).style('height', height + 'px');
 
-    // for (var key in dataToLoad) {
-    //     svg.select('#' + key).attr('d', path);
-    // }
+    // Redraw SVG buffers
+    for (var key in dataToLoad) {
+        svg.select('#' + key).attr('d', svgPath);
+    }
     
     // Clear whatever is currently drawn
     c.clearRect(0, 0, width, height);
