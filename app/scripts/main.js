@@ -132,7 +132,7 @@ String.prototype.removeRight = function(suffix) {
     return this.substring(0, this.length - suffix.length);
 };
 
-var land;
+var land, borders;
 
 var queue = queue()
     .defer(d3.json, '../data/world-110m.json');
@@ -148,6 +148,7 @@ function ready(error, results) {
     // Load world data
     var landResult = results.shift();
     land = topojson.feature(landResult, landResult.objects.land);
+    borders = topojson.mesh(landResult, landResult.objects.countries, function(a, b) { return a !== b; });
 
     // Load all other path + buffer data
     results.forEach(function(result) {
@@ -324,6 +325,9 @@ function draw() {
         c.beginPath(),
         path(land),
         c.fill(),
+        c.stroke();
+    c.beginPath(),
+        path(borders),
         c.stroke();
 
     for (var key in dataToLoad) {
