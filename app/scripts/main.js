@@ -201,58 +201,68 @@ function ready(error, results) {
 }
 
 function drawBuffer(pathName) {
-    var buffer = svg.append('a')
-                    .attr('class', 'buffer')
-                    .attr('xlink:href', dataToLoad[pathName]['url'])
-                    .append('path')
-                        .attr('id', pathName)
-                        .datum(dataToLoad[pathName]['buffer']);
+    dataToLoad[pathName]['buffer-element'] = svg.append('a')
+                                                .attr('class', 'buffer')
+                                                .attr('xlink:href', dataToLoad[pathName]['url'])
+                                                .append('path')
+                                                    // .attr('id', pathName)
+                                                    .datum(dataToLoad[pathName]['buffer']);
 
-    var link = d3.select('.copy .' + pathName);
-    link.style('transition-duration', transitionDurationStroke + 'ms');
+    dataToLoad[pathName]['link-element'] = d3.select('.copy .' + pathName);
+    dataToLoad[pathName]['link-element'].style('transition-duration', transitionDurationStroke + 'ms');
 
-    function setTextShadow(width) {
-        var textShadow = '0px 0px ' + width + 'px';
-        if (width > 0) {
-            textShadow += ' ' + dataToLoad[pathName]['color'];
-        }
-        link.style('text-shadow', textShadow);
+    function doMouseoverBuffer() {
+        doMouseover(pathName, false);
     }
 
-    function setPathStroke(width) {
-        d3.transition()
-            .duration(transitionDurationStroke)
-            .tween("width", function() {
-                w = d3.interpolate(dataToLoad[pathName]['stroke-width'], width);
-                return function(t) {
-                    dataToLoad[pathName]['stroke-width'] = w(t);
-                    draw();
-                };
-            });
-    }
-
-    function doMouseover() {
-        if (!isRotating) {
-            resetPathStrokes();
-            setPathStroke(pathStyle['hover']['stroke-width']);
-            rotate(dataToLoad[pathName]['center-lon'], pathName);
-        }
-        setTextShadow(blurRadius);
+    function doMouseoverLink() {
+        doMouseover(pathName, true);
     }
 
     function doMouseout() {
         if (!isRotating) {
-            setPathStroke(pathStyle['stroke-width']);
+            setPathStroke(pathName, pathStyle['stroke-width']);
         }
-        setTextShadow(0);
+        setTextShadow(pathName, 0);
     }
 
     // Add event handlers to svg buffers and to html links
-    buffer.on('mouseover', doMouseover);
-    link.on('mouseover', doMouseover);
+    dataToLoad[pathName]['buffer-element'].on('mouseover', doMouseoverBuffer);
+    dataToLoad[pathName]['link-element'].on('mouseover', doMouseoverLink);
 
-    buffer.on('mouseout', doMouseout);
-    link.on('mouseout', doMouseout);
+    dataToLoad[pathName]['buffer-element'].on('mouseout', doMouseout);
+    dataToLoad[pathName]['link-element'].on('mouseout', doMouseout);
+}
+
+function setPathStroke(pathName, width) {
+    d3.transition()
+        .duration(transitionDurationStroke)
+        .tween("width", function() {
+            w = d3.interpolate(dataToLoad[pathName]['stroke-width'], width);
+            return function(t) {
+                dataToLoad[pathName]['stroke-width'] = w(t);
+                draw();
+            };
+        });
+}
+
+function setTextShadow(pathName, width) {
+    var textShadow = '0px 0px ' + width + 'px';
+    if (width > 0) {
+        textShadow += ' ' + dataToLoad[pathName]['color'];
+    }
+    dataToLoad[pathName]['link-element'].style('text-shadow', textShadow);
+}
+
+function doMouseover(pathName, fromLink) {
+    if (!isRotating || fromLink) {
+        resetPathStrokes();
+        if (!isRotating) {
+            setPathStroke(pathName, pathStyle['hover']['stroke-width']);
+        }
+        rotate(dataToLoad[pathName]['center-lon'], fromLink ? pathName : null);
+    }
+    setTextShadow(pathName, blurRadius);
 }
 
 function resize() {
@@ -331,7 +341,7 @@ function drawSvg() {
 
     // Redraw SVG buffers
     for (var key in dataToLoad) {
-        svg.select('#' + key).attr('d', svgPath);
+        dataToLoad[key]['buffer-element'].attr('d', svgPath);
     }
 }
 
