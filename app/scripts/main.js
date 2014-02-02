@@ -89,15 +89,16 @@ var dataToLoad = {
     },
 };
 
-// State variables
-var isRotating = false;
-
 // Image loading
 function loadImage(url) {
     var image = new Image();
     image.src = url;
     return image;
 }
+
+// State variables
+var isRotating = false;
+var firstRun = true;
 
 var map = d3.select('#map');
 var canvas = map.append("canvas")  
@@ -300,6 +301,12 @@ function draw() {
     canvas
         .attr("width", width)  
         .attr("height", height);
+
+    // Add ready class to canvas to draw background and border
+    if (firstRun) {
+        firstRun = false;
+        canvas.attr('class', 'ready');
+    }
 
     d3.select(self.frameElement).style('height', height + 'px');
     

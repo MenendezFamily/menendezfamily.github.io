@@ -20,7 +20,7 @@ body {
   width: 100%;
   text-align: center;
 
-  canvas {
+  canvas.ready { /* Only draw background and border once canvas is sized */
     background: url('../images/low_contrast_linen.png');
     border-bottom: 1px solid @gray-dark;
   }
