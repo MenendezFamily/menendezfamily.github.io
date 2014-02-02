@@ -1,7 +1,8 @@
 // Map centering variables
-var lonRotate = 60;
-var latRotate = -10;
+var lonRotate = -60;
+var latRotate = 10;
 var latBottom = 24;
+var latCenter = 30;
 
 // Map sizing variables
 var mapRatio = 0.5;
@@ -31,9 +32,16 @@ var colors = {
 
 // Display variables
 var transitionDurationStroke = 300,
-    transitionDurationWorld = 1000,
+    transitionDurationWorld = 500,
     shadowHeight = 4,
     blurRadius = 3;
+
+var lon = {
+    'us': -100,
+    'spain': -7,
+    'us-edge': -65,
+    'spain-edge': -20,
+};
 
 var pathStyle = {
     'stroke-width': 3,
@@ -53,6 +61,34 @@ var landStyle = {
     'background-image': loadImage('images/mochaGrunge.png'),
 };
 
+// Data loading
+var dataToLoad = {
+    'at': {
+        'url': 'at/',
+        'color': colors['brown'],
+        'stroke-width': pathStyle['stroke-width'],
+        'center-lon': lon['us'],
+    },
+    'momdad': {
+        'url': 'http://mannymarsha.wordpress.com/',
+        'color': colors['purple'],
+        'stroke-width': pathStyle['stroke-width'],
+        'center-lon': lon['us'],
+    },
+    'transam': {
+        'url': 'http://picasaweb.com/nathanbiketrip',
+        'color': colors['green'],
+        'stroke-width': pathStyle['stroke-width'],
+        'center-lon': lon['us'],
+    },
+    'camino': {
+        'url': 'http://blog.travelpod.com/travel-blog/aggiesontheway/2/tpod.html',
+        'color': colors['red'],
+        'stroke-width': pathStyle['stroke-width'],
+        'center-lon': lon['spain'],
+    },
+};
+
 // State variables
 var isRotating = false;
 
@@ -62,34 +98,6 @@ function loadImage(url) {
     image.src = url;
     return image;
 }
-
-// Data loading
-var dataToLoad = {
-    'at': {
-        'url': 'at/',
-        'color': colors['brown'],
-        'stroke-width': pathStyle['stroke-width'],
-        'center-lon': 100,
-    },
-    'momdad': {
-        'url': 'http://mannymarsha.wordpress.com/',
-        'color': colors['purple'],
-        'stroke-width': pathStyle['stroke-width'],
-        'center-lon': 100,
-    },
-    'transam': {
-        'url': 'http://picasaweb.com/nathanbiketrip',
-        'color': colors['green'],
-        'stroke-width': pathStyle['stroke-width'],
-        'center-lon': 100,
-    },
-    'camino': {
-        'url': 'http://blog.travelpod.com/travel-blog/aggiesontheway/2/tpod.html',
-        'color': colors['red'],
-        'stroke-width': pathStyle['stroke-width'],
-        'center-lon': 7,
-    },
-};
 
 var map = d3.select('#map');
 var canvas = map.append("canvas")  
@@ -164,6 +172,32 @@ function ready(error, results) {
     // Add resize event handler and run for the first time
     d3.select(window).on('resize', resize);
     resize();
+
+    // Add mousemove event handler for auto rotation
+    d3.select(window).on("mousemove", function() {
+        if (!isRotating) {
+            if ( lonRotate === lon['us'] &&
+                 d3.event.clientX > projection([lon['us-edge'], latCenter])[0] ) {
+                // Scroll to Spain
+                rotate(lon['spain']);
+            }
+            else if ( lonRotate === lon['spain'] &&
+                      d3.event.clientX < projection([lon['spain-edge'], latCenter])[0] ) {
+                // Scroll to US
+                rotate(lon['us']);
+            }
+            else if ( lonRotate !== lon['us'] && lonRotate !== lon['spain'] ) {
+                if ( d3.event.clientX < (width / 2) ) {
+                    // Scroll to US
+                    rotate(lon['us']);                    
+                }
+                else {
+                    // Scroll to Spain
+                    rotate(lon['spain']);
+                }
+            }
+        }
+    });
 }
 
 function drawBuffer(pathName) {
@@ -248,8 +282,8 @@ function resize() {
 
 function draw() {
     projection
-        .rotate([lonRotate, latRotate])
-        .center([0, latRotate + latBottom])
+        .rotate([-lonRotate, -latRotate])
+        .center([0, latBottom - latRotate])
         .scale(scale)
         .translate([width / 2, height]);
 
@@ -302,7 +336,7 @@ function drawSvg() {
 }
 
 function rotate(to) {
-    var from = projection.rotate()[0];
+    var from = -projection.rotate()[0];
     if (from !== to) {
         isRotating = true;
         resetPathStrokes();
