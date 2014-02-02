@@ -8,7 +8,6 @@ var latCenter = 30;
 var mapRatio = 0.5;
 var maxWidthRatio = 0.6;
 var maxHeightRatio = 1.3;
-var patternSide = 400;
 
 var width = 0, height = 0, scale = 0;
 
@@ -101,7 +100,7 @@ var isRotating = false;
 var firstRun = true;
 
 var map = d3.select('#map');
-var canvas = map.append('canvas')  
+var canvas = map.append('canvas');
 var svg = map.append('svg');
 
 var c = canvas.node().getContext('2d');
@@ -124,11 +123,11 @@ var svgPath = d3.geo.path()
 
 // Add helper methods to String
 if (typeof String.prototype.endsWith !== 'function') {
-    String.prototype.endsWith = function(suffix) {
+    String.prototype.endsWith = function (suffix) {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
 }
-String.prototype.removeRight = function(suffix) {
+String.prototype.removeRight = function (suffix) {
     return this.substring(0, this.length - suffix.length);
 };
 
@@ -148,18 +147,18 @@ function ready(error, results) {
     // Load world data
     var landResult = results.shift();
     land = topojson.feature(landResult, landResult.objects.land);
-    borders = topojson.mesh(landResult, landResult.objects.countries, function(a, b) { return a !== b; });
+    borders = topojson.mesh(landResult, landResult.objects.countries, function (a, b) { return a !== b; });
 
     // Load all other path + buffer data
-    results.forEach(function(result) {
+    results.forEach(function (result) {
         for (var key in result.objects) {
             if (dataToLoad[key]) {
                 dataToLoad[key]['feature'] = topojson.feature(result, result.objects[key]);
             }
             else if (key.endsWith('_buffer')) {
-                parent = key.removeRight('_buffer');
-                if (dataToLoad[parent]) {
-                    dataToLoad[parent]['buffer'] = topojson.feature(result, result.objects[key]);
+                var parentKey = key.removeRight('_buffer');
+                if (dataToLoad[parentKey]) {
+                    dataToLoad[parentKey]['buffer'] = topojson.feature(result, result.objects[key]);
                 }
             }
         }
@@ -176,7 +175,7 @@ function ready(error, results) {
     resize();
 
     // Add mousemove event handler for auto rotation
-    svg.on('mousemove', function() {
+    svg.on('mousemove', function () {
         if (!isRotating) {
             if ( lonRotate === lon['us'] &&
                  d3.event.clientX > projection([lon['us-edge'], latCenter])[0] ) {
@@ -191,7 +190,7 @@ function ready(error, results) {
             else if ( lonRotate !== lon['us'] && lonRotate !== lon['spain'] ) {
                 if ( d3.event.clientX < (width / 2) ) {
                     // Scroll to US
-                    rotate(lon['us']);                    
+                    rotate(lon['us']);
                 }
                 else {
                     // Scroll to Spain
@@ -207,7 +206,6 @@ function drawBuffer(pathName) {
                                                 .attr('class', 'buffer')
                                                 .attr('xlink:href', dataToLoad[pathName]['url'])
                                                 .append('path')
-                                                    // .attr('id', pathName)
                                                     .datum(dataToLoad[pathName]['buffer']);
 
     dataToLoad[pathName]['link-element'] = d3.select('.copy .' + pathName);
@@ -240,7 +238,7 @@ function setPathStroke(pathName, width) {
     d3.transition()
         .duration(transitionDurationStroke)
         .tween('width', function() {
-            w = d3.interpolate(dataToLoad[pathName]['stroke-width'], width);
+            var w = d3.interpolate(dataToLoad[pathName]['stroke-width'], width);
             return function(t) {
                 dataToLoad[pathName]['stroke-width'] = w(t);
                 draw();
@@ -272,11 +270,10 @@ function resize() {
     c.clearRect(0, 0, width, height);
 
     // Calculate dimensions to ensure entire page is always visible
-    var nonMapHeight = parseInt(d3.select('.container').style('height')) +
-                       parseInt(d3.select('#footer').style('height')) +
-                       5;
+    var nonMapHeight = parseInt(d3.select('.container').style('height'), 10) +
+                       parseInt(d3.select('#footer').style('height'), 10);
 
-    width = parseInt(map.style('width'));
+    width = parseInt(map.style('width'), 10);
 
     height = Math.min(
         Math.round(width * mapRatio),
@@ -300,7 +297,7 @@ function draw() {
         .translate([width / 2, height]);
 
     canvas
-        .attr('width', width)  
+        .attr('width', width)
         .attr('height', height);
 
     // Add ready class to canvas to draw background and border
@@ -309,7 +306,7 @@ function draw() {
         canvas.attr('class', 'ready');
     }
 
-    d3.select(self.frameElement).style('height', height + 'px');
+    map.style('height', height + 'px');
     
     // Clear whatever is currently drawn
     c.clearRect(0, 0, width, height);
@@ -369,14 +366,14 @@ function rotate(to, pathName) {
 
         d3.transition()
             .duration(transitionDurationWorld)
-            .tween('rotate', function() {
-                r = d3.interpolate(from, to);
-                return function(t) {
+            .tween('rotate', function () {
+                var r = d3.interpolate(from, to);
+                return function (t) {
                     lonRotate = r(t);
                     draw();
                 };
             })
-            .each('end', function() {
+            .each('end', function () {
                 isRotating = false; // Enable events
                 drawSvg(); // Move the invisible SVG buffers into place
             });
