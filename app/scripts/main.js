@@ -287,7 +287,7 @@ function rotate(lon) {
         .tween("rotate", function() {
             r = d3.interpolate(projection.rotate()[0], lon);
             return function(t) {
-                lonRotate = r(t)
+                lonRotate = r(t);
                 draw();
             };
         })
