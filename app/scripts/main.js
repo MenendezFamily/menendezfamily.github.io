@@ -174,7 +174,7 @@ function ready(error, results) {
     resize();
 
     // Add mousemove event handler for auto rotation
-    d3.select(window).on("mousemove", function() {
+    svg.on("mousemove", function() {
         if (!isRotating) {
             if ( lonRotate === lon['us'] &&
                  d3.event.clientX > projection([lon['us-edge'], latCenter])[0] ) {
@@ -235,7 +235,7 @@ function drawBuffer(pathName) {
         if (!isRotating) {
             resetPathStrokes();
             setPathStroke(pathStyle['hover']['stroke-width']);
-            rotate(dataToLoad[pathName]['center-lon']);
+            rotate(dataToLoad[pathName]['center-lon'], pathName);
         }
         setTextShadow(blurRadius);
     }
@@ -335,11 +335,17 @@ function drawSvg() {
     }
 }
 
-function rotate(to) {
+function rotate(to, pathName) {
     var from = -projection.rotate()[0];
     if (from !== to) {
-        isRotating = true;
-        resetPathStrokes();
+        isRotating = true; // Disable all mouse events
+        resetPathStrokes(); // Set all strokes to default width
+
+        // If this rotate was caused by link mouseover, set stroke to hovered width
+        if (pathName) {
+            dataToLoad[pathName]['stroke-width'] = pathStyle['hover']['stroke-width'];
+        }
+
         d3.transition()
             .duration(transitionDurationWorld)
             .tween("rotate", function() {
@@ -350,8 +356,8 @@ function rotate(to) {
                 };
             })
             .each('end', function() {
-                isRotating = false;
-                drawSvg();
+                isRotating = false; // Enable events
+                drawSvg(); // Move the invisible SVG buffers into place
             });
     }
 }
