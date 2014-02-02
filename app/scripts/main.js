@@ -222,13 +222,13 @@ function resize() {
         height * maxHeightRatio
     );
 
-    draw([lonRotate, latRotate]);
+    draw();
     drawSvg();
 }
 
-function draw(rotation) {
+function draw() {
     projection
-        .rotate(rotation)
+        .rotate([lonRotate, latRotate])
         .center([0, latRotate + latBottom])
         .scale(scale)
         .translate([width / 2, height]);
@@ -281,15 +281,14 @@ function drawSvg() {
     }
 }
 
-function testRotate(lon) {
-    lonRotate = lon;
-
+function rotate(lon) {
     d3.transition()
         .duration(transitionDurationWorld)
         .tween("rotate", function() {
-            r = d3.interpolate(projection.rotate(), [lonRotate, latRotate]);
+            r = d3.interpolate(projection.rotate()[0], lon);
             return function(t) {
-                draw(r(t));
+                lonRotate = r(t)
+                draw();
             };
         })
         .each('end', drawSvg);
