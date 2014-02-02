@@ -53,6 +53,9 @@ var landStyle = {
     'background-image': loadImage('images/mochaGrunge.png'),
 };
 
+// State variables
+var isRotating = false;
+
 // Image loading
 function loadImage(url) {
     var image = new Image();
@@ -195,13 +198,18 @@ function drawBuffer(pathName) {
     }
 
     function doMouseover() {
-        resetPathStrokes();
-        setPathStroke(pathStyle['hover']['stroke-width']);
+        if (!isRotating) {
+            resetPathStrokes();
+            setPathStroke(pathStyle['hover']['stroke-width']);
+            rotate(dataToLoad[pathName]['center-lon']);
+        }
         setTextShadow(blurRadius);
     }
 
     function doMouseout() {
-        setPathStroke(pathStyle['stroke-width']);
+        if (!isRotating) {
+            setPathStroke(pathStyle['stroke-width']);
+        }
         setTextShadow(0);
     }
 
@@ -293,18 +301,25 @@ function drawSvg() {
     }
 }
 
-function rotate(lon) {
-    resetPathStrokes();
-    d3.transition()
-        .duration(transitionDurationWorld)
-        .tween("rotate", function() {
-            r = d3.interpolate(projection.rotate()[0], lon);
-            return function(t) {
-                lonRotate = r(t);
-                draw();
-            };
-        })
-        .each('end', drawSvg);
+function rotate(to) {
+    var from = projection.rotate()[0];
+    if (from !== to) {
+        isRotating = true;
+        resetPathStrokes();
+        d3.transition()
+            .duration(transitionDurationWorld)
+            .tween("rotate", function() {
+                r = d3.interpolate(from, to);
+                return function(t) {
+                    lonRotate = r(t);
+                    draw();
+                };
+            })
+            .each('end', function() {
+                isRotating = false;
+                drawSvg();
+            });
+    }
 }
 
 function resetPathStrokes() {
