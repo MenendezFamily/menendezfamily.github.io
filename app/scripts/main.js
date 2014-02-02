@@ -57,17 +57,11 @@ var graticuleStyle = {
 var landStyle = {
     'stroke': colors['gray'],
     'stroke-width': 1,
-    'background-image': loadImage('images/mochaGrunge.png'),
+    'background-image': loadImage('images/mochaGrunge.jpg'),
 };
 
 // Data loading
 var dataToLoad = {
-    'at': {
-        'url': 'at/',
-        'color': colors['brown'],
-        'stroke-width': pathStyle['stroke-width'],
-        'center-lon': lon['us'],
-    },
     'momdad': {
         'url': 'http://mannymarsha.wordpress.com/',
         'color': colors['purple'],
@@ -77,6 +71,12 @@ var dataToLoad = {
     'transam': {
         'url': 'http://picasaweb.com/nathanbiketrip',
         'color': colors['green'],
+        'stroke-width': pathStyle['stroke-width'],
+        'center-lon': lon['us'],
+    },
+    'at': {
+        'url': 'at/',
+        'color': colors['brown'],
         'stroke-width': pathStyle['stroke-width'],
         'center-lon': lon['us'],
     },
