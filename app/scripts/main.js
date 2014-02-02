@@ -101,10 +101,10 @@ var isRotating = false;
 var firstRun = true;
 
 var map = d3.select('#map');
-var canvas = map.append("canvas")  
+var canvas = map.append('canvas')  
 var svg = map.append('svg');
 
-var c = canvas.node().getContext("2d");
+var c = canvas.node().getContext('2d');
 
 var graticule = d3.geo.graticule();
 
@@ -175,7 +175,7 @@ function ready(error, results) {
     resize();
 
     // Add mousemove event handler for auto rotation
-    svg.on("mousemove", function() {
+    svg.on('mousemove', function() {
         if (!isRotating) {
             if ( lonRotate === lon['us'] &&
                  d3.event.clientX > projection([lon['us-edge'], latCenter])[0] ) {
@@ -238,7 +238,7 @@ function drawBuffer(pathName) {
 function setPathStroke(pathName, width) {
     d3.transition()
         .duration(transitionDurationStroke)
-        .tween("width", function() {
+        .tween('width', function() {
             w = d3.interpolate(dataToLoad[pathName]['stroke-width'], width);
             return function(t) {
                 dataToLoad[pathName]['stroke-width'] = w(t);
@@ -299,8 +299,8 @@ function draw() {
         .translate([width / 2, height]);
 
     canvas
-        .attr("width", width)  
-        .attr("height", height);
+        .attr('width', width)  
+        .attr('height', height);
 
     // Add ready class to canvas to draw background and border
     if (firstRun) {
@@ -365,7 +365,7 @@ function rotate(to, pathName) {
 
         d3.transition()
             .duration(transitionDurationWorld)
-            .tween("rotate", function() {
+            .tween('rotate', function() {
                 r = d3.interpolate(from, to);
                 return function(t) {
                     lonRotate = r(t);
