@@ -65,18 +65,26 @@ var dataToLoad = {
     'at': {
         'url': 'at/',
         'color': colors['brown'],
+        'stroke-width': pathStyle['stroke-width'],
+        'center-lon': 100,
     },
     'momdad': {
         'url': 'http://mannymarsha.wordpress.com/',
         'color': colors['purple'],
+        'stroke-width': pathStyle['stroke-width'],
+        'center-lon': 100,
     },
     'transam': {
         'url': 'http://picasaweb.com/nathanbiketrip',
         'color': colors['green'],
+        'stroke-width': pathStyle['stroke-width'],
+        'center-lon': 100,
     },
     'camino': {
         'url': 'http://blog.travelpod.com/travel-blog/aggiesontheway/2/tpod.html',
         'color': colors['red'],
+        'stroke-width': pathStyle['stroke-width'],
+        'center-lon': 7,
     },
 };
 
@@ -174,22 +182,26 @@ function drawBuffer(pathName) {
         link.style('text-shadow', textShadow);
     }
 
+    function setPathStroke(width) {
+        d3.transition()
+            .duration(transitionDurationStroke)
+            .tween("width", function() {
+                w = d3.interpolate(dataToLoad[pathName]['stroke-width'], width);
+                return function(t) {
+                    dataToLoad[pathName]['stroke-width'] = w(t);
+                    draw();
+                };
+            });
+    }
+
     function doMouseover() {
-        // setPathStroke(mouseoverStrokeWidth);
+        resetPathStrokes();
+        setPathStroke(pathStyle['hover']['stroke-width']);
         setTextShadow(blurRadius);
-        // d3.transition()
-        //     .tween("rotate", function() {
-        //         r = d3.interpolate(projection.rotate(), [100, latRotate]);
-        //         return function(t) {
-        //             projection.rotate(r(t));
-        //             svg.select('#momdad').attr('d', window.path);
-        //         };
-        //     })
-        //     .transition();
     }
 
     function doMouseout() {
-        // setPathStroke(defaultStrokeWidth);
+        setPathStroke(pathStyle['stroke-width']);
         setTextShadow(0);
     }
 
@@ -257,7 +269,7 @@ function draw() {
 
     for (var key in dataToLoad) {
         c.strokeStyle = dataToLoad[key]['color'],
-            c.lineWidth = pathStyle['stroke-width'],
+            c.lineWidth = dataToLoad[key]['stroke-width'],
             c.beginPath(), path(dataToLoad[key]['feature']),
             c.stroke();
     }
@@ -282,6 +294,7 @@ function drawSvg() {
 }
 
 function rotate(lon) {
+    resetPathStrokes();
     d3.transition()
         .duration(transitionDurationWorld)
         .tween("rotate", function() {
@@ -292,4 +305,11 @@ function rotate(lon) {
             };
         })
         .each('end', drawSvg);
+}
+
+function resetPathStrokes() {
+    for (var key in dataToLoad) {
+        dataToLoad[key]['stroke-width'] = pathStyle['stroke-width'];
+    }
+    draw();
 }
